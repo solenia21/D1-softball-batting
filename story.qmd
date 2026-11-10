@@ -1,0 +1,66 @@
+---
+title: "Story"
+format:
+  html:
+    echo: false
+    warning: false
+    message: false
+---
+
+This page uses static snapshots of the same D1 Softball batting data as the Explorer. Each plot shows player-seasons with at least 50 plate appearances; Pearson's *r* summarizes the direction and strength of a linear association.
+
+```{r}
+source("_batting_data.R")
+
+story_data <- batting |>
+  filter(PA >= 50)
+
+correlation <- \(x, y) cor(x, y, use = "complete.obs")
+
+scatter <- \(y, label) {
+  ggplot2::ggplot(story_data, ggplot2::aes(x = BA, y = {{ y }})) +
+    ggplot2::geom_point(alpha = 0.35, color = "#2878a0") +
+    ggplot2::geom_smooth(method = "lm", se = FALSE, color = "#c65353") +
+    ggplot2::labs(
+      x = "Batting Average (BA)",
+      y = label
+    ) +
+    ggplot2::theme_minimal()
+}
+```
+
+## Batting average and on-base percentage
+
+The plot compares batting average with on-base percentage (OBP), which also counts reaching base via walks and hit-by-pitches. Their Pearson correlation is **`r round(correlation(story_data$BA, story_data$OBP), 2)`**. A positive association is expected because hits contribute to both measures, while differences from the trend can reflect players' walks and other ways of reaching base.
+
+This relationship is descriptive, not causal: it does not mean that increasing batting average by itself causes a particular OBP. The spread around the trend is useful because it shows how much OBP can differ for players with similar batting averages.
+
+```{r}
+scatter(OBP, "On-Base Percentage (OBP)")
+```
+
+## Batting average and slugging percentage
+
+Slugging percentage (SLG) gives extra weight to doubles, triples, and home runs. Its Pearson correlation with batting average is **`r round(correlation(story_data$BA, story_data$SLG), 2)`**. A positive association reflects that hits drive both statistics, but players with similar batting averages can have different slugging percentages depending on how many hits go for extra bases.
+
+The fitted line summarizes the overall linear trend; it does not capture every difference in power or playing time. Each dot is a player-season, so the same player may appear once per season.
+
+```{r}
+scatter(SLG, "Slugging Percentage (SLG)")
+```
+
+## Batting average and strikeouts
+
+Unlike OBP and SLG, strikeouts have little linear association with batting average in these data (Pearson's *r* = **`r round(correlation(story_data$BA, story_data$K), 2)`**). Strikeouts are one way an at-bat can end, but batting average depends on hits divided by at-bats; players can have similar batting averages while having different numbers of at-bats and strikeouts. The slight trend should not be read as a strong relationship.
+
+```{r}
+scatter(K, "Strikeouts (K)")
+```
+
+## Batting average and walks
+
+Walks also have only a weak association with batting average (Pearson's *r* = **`r round(correlation(story_data$BA, story_data$BB), 2)`**). A walk is not counted as an at-bat, so it does not directly raise or lower batting average. Differences in plate appearances and player roles can still make the counts vary, which is why the points are spread out rather than forming a strong trend.
+
+```{r}
+scatter(BB, "Walks (BB)")
+```

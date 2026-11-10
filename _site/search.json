@@ -1,0 +1,51 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "D1 Softball Batting",
+    "section": "",
+    "text": "Explore NCAA Division I softball batting statistics with the interactive plot on the Explorer page, or read a guided explanation of how batting average relates to other statistics on the Story page."
+  },
+  {
+    "objectID": "story.html",
+    "href": "story.html",
+    "title": "Story",
+    "section": "",
+    "text": "This page uses static snapshots of the same D1 Softball batting data as the Explorer. Each plot shows player-seasons with at least 50 plate appearances; Pearson’s r summarizes the direction and strength of a linear association."
+  },
+  {
+    "objectID": "story.html#batting-average-and-on-base-percentage",
+    "href": "story.html#batting-average-and-on-base-percentage",
+    "title": "Story",
+    "section": "Batting average and on-base percentage",
+    "text": "Batting average and on-base percentage\nThe plot compares batting average with on-base percentage (OBP), which also counts reaching base via walks and hit-by-pitches. Their Pearson correlation is 0.84. A positive association is expected because hits contribute to both measures, while differences from the trend can reflect players’ walks and other ways of reaching base.\nThis relationship is descriptive, not causal: it does not mean that increasing batting average by itself causes a particular OBP. The spread around the trend is useful because it shows how much OBP can differ for players with similar batting averages."
+  },
+  {
+    "objectID": "story.html#batting-average-and-slugging-percentage",
+    "href": "story.html#batting-average-and-slugging-percentage",
+    "title": "Story",
+    "section": "Batting average and slugging percentage",
+    "text": "Batting average and slugging percentage\nSlugging percentage (SLG) gives extra weight to doubles, triples, and home runs. Its Pearson correlation with batting average is 0.75. A positive association reflects that hits drive both statistics, but players with similar batting averages can have different slugging percentages depending on how many hits go for extra bases.\nThe fitted line summarizes the overall linear trend; it does not capture every difference in power or playing time. Each dot is a player-season, so the same player may appear once per season."
+  },
+  {
+    "objectID": "story.html#batting-average-and-strikeouts",
+    "href": "story.html#batting-average-and-strikeouts",
+    "title": "Story",
+    "section": "Batting average and strikeouts",
+    "text": "Batting average and strikeouts\nUnlike OBP and SLG, strikeouts have little linear association with batting average in these data (Pearson’s r = -0.16). Strikeouts are one way an at-bat can end, but batting average depends on hits divided by at-bats; players can have similar batting averages while having different numbers of at-bats and strikeouts. The slight trend should not be read as a strong relationship."
+  },
+  {
+    "objectID": "story.html#batting-average-and-walks",
+    "href": "story.html#batting-average-and-walks",
+    "title": "Story",
+    "section": "Batting average and walks",
+    "text": "Batting average and walks\nWalks also have only a weak association with batting average (Pearson’s r = 0.31). A walk is not counted as an at-bat, so it does not directly raise or lower batting average. Differences in plate appearances and player roles can still make the counts vary, which is why the points are spread out rather than forming a strong trend."
+  },
+  {
+    "objectID": "explorer.html",
+    "href": "explorer.html",
+    "title": "Explorer",
+    "section": "",
+    "text": "players = transpose(batting_raw)\n\nviewof y_metric = Inputs.radio(\n  new Map([\n    [\"On-Base Percentage (OBP)\", \"OBP\"],\n    [\"Slugging Percentage (SLG)\", \"SLG\"],\n    [\"Home Runs (HR)\", \"HR\"],\n    [\"At Bats (AB)\", \"AB\"]\n  ]),\n  { value: \"OBP\", label: \"Y-Axis Metric:\" }\n)\n\nviewof season_filter = Inputs.select(\n  [\"All\", \"2026\", \"2025\"],\n  { value: \"All\", label: \"Season:\" }\n)\n\nviewof player_team_search = Inputs.text(\n  { placeholder: \"Search players or teams\", label: \"Search:\" }\n)\n\nviewof min_pa = Inputs.range(\n  [0, 200],\n  { value: 50, step: 10, label: \"Minimum PA:\" }\n)\n\nfiltered = players.filter(d =&gt;\n  (season_filter === \"All\" || d.Season === season_filter) &&\n  `${d.Player} ${d.Team}`.toLowerCase().includes(player_team_search.trim().toLowerCase()) &&\n  d.PA &gt;= min_pa\n)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nShowing  player-seasons\n\ny_labels = ({\n  OBP: \"On-Base Percentage (OBP)\",\n  SLG: \"Slugging Percentage (SLG)\",\n  HR: \"Home Runs (HR)\",\n  AB: \"At Bats (AB)\"\n})\n\nPlot.plot({\n  width: 800,\n  height: 520,\n  grid: true,\n  x: {\n    label: \"Batting Average (BA)\",\n    domain: [0.1, 0.55]\n  },\n  y: {\n    label: y_labels[y_metric],\n    nice: true\n  },\n  color: {\n    legend: true,\n    label: \"Class\"\n  },\n  marks: [\n    Plot.dot(filtered, {\n      x: \"BA\",\n      y: y_metric,\n      stroke: \"Class\",\n      fill: \"Class\",\n      fillOpacity: 0.55,\n      r: 3.5,\n      tip: true,\n      title: d =&gt; `${d.Player} (${d.Team}, ${d.Season})\\nClass: ${d.Class} | POS: ${d.POS} | PA: ${d.PA} | AB: ${d.AB}\\nBA: ${d.BA.toFixed(3)} | OBP: ${d.OBP.toFixed(3)} | SLG: ${d.SLG.toFixed(3)} | HR: ${d.HR}`\n    })\n  ]\n})"
+  }
+]

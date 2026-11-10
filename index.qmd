@@ -1,0 +1,5 @@
+---
+title: "D1 Softball Batting"
+---
+
+Explore NCAA Division I softball batting statistics with the interactive plot on the [Explorer page](explorer.qmd), or read a guided explanation of how batting average relates to other statistics on the [Story page](story.qmd).

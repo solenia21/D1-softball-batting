@@ -1,0 +1,89 @@
+---
+title: "Explorer"
+format:
+  html:
+    echo: false
+    warning: false
+    message: false
+---
+
+```{r}
+source("_batting_data.R")
+
+ojs_define(batting_raw = batting)
+```
+
+```{ojs}
+players = transpose(batting_raw)
+
+viewof y_metric = Inputs.radio(
+  new Map([
+    ["On-Base Percentage (OBP)", "OBP"],
+    ["Slugging Percentage (SLG)", "SLG"],
+    ["Home Runs (HR)", "HR"],
+    ["At Bats (AB)", "AB"]
+  ]),
+  { value: "OBP", label: "Y-Axis Metric:" }
+)
+
+viewof season_filter = Inputs.select(
+  ["All", "2026", "2025"],
+  { value: "All", label: "Season:" }
+)
+
+viewof player_team_search = Inputs.text(
+  { placeholder: "Search players or teams", label: "Search:" }
+)
+
+viewof min_pa = Inputs.range(
+  [0, 200],
+  { value: 50, step: 10, label: "Minimum PA:" }
+)
+
+filtered = players.filter(d =>
+  (season_filter === "All" || d.Season === season_filter) &&
+  `${d.Player} ${d.Team}`.toLowerCase().includes(player_team_search.trim().toLowerCase()) &&
+  d.PA >= min_pa
+)
+```
+
+**Showing ${filtered.length.toLocaleString()} player-seasons**
+
+```{ojs}
+y_labels = ({
+  OBP: "On-Base Percentage (OBP)",
+  SLG: "Slugging Percentage (SLG)",
+  HR: "Home Runs (HR)",
+  AB: "At Bats (AB)"
+})
+
+Plot.plot({
+  width: 800,
+  height: 520,
+  grid: true,
+  x: {
+    label: "Batting Average (BA)",
+    domain: [0.1, 0.55]
+  },
+  y: {
+    label: y_labels[y_metric],
+    nice: true
+  },
+  color: {
+    legend: true,
+    label: "Class"
+  },
+  marks: [
+    Plot.dot(filtered, {
+      x: "BA",
+      y: y_metric,
+      stroke: "Class",
+      fill: "Class",
+      fillOpacity: 0.55,
+      r: 3.5,
+      tip: true,
+      title: d => `${d.Player} (${d.Team}, ${d.Season})\nClass: ${d.Class} | POS: ${d.POS} | PA: ${d.PA} | AB: ${d.AB}\nBA: ${d.BA.toFixed(3)} | OBP: ${d.OBP.toFixed(3)} | SLG: ${d.SLG.toFixed(3)} | HR: ${d.HR}`
+    })
+  ]
+})
+```
